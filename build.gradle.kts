@@ -26,7 +26,6 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	runtimeOnly("mysql:mysql-connector-java")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	// implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
 }
 
 
