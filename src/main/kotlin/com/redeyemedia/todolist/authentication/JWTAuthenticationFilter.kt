@@ -24,7 +24,7 @@ import javax.crypto.SecretKey
 
 
 
-class JWTAuthenticationFilter(authenticationManager: AuthenticationManager) :
+open class JWTAuthenticationFilter(authenticationManager: AuthenticationManager) :
     UsernamePasswordAuthenticationFilter() {
 
     // TRY TO AUTHENTICATE
@@ -33,8 +33,10 @@ class JWTAuthenticationFilter(authenticationManager: AuthenticationManager) :
         response: HttpServletResponse?
     ): Authentication {
 
-        val username = request.getParameter("username")
-        val password = request.getParameter("password")
+/*        val username = request.getParameter("username")
+        val password = request.getParameter("password")*/
+        val username = request.getHeader("username")
+        val password = request.getHeader("password")
         val authenticationToken = UsernamePasswordAuthenticationToken(username, password)
 
         return authenticationManager.authenticate(authenticationToken)

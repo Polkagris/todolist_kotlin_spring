@@ -1,11 +1,14 @@
 package com.redeyemedia.todolist.controllers
 
+import JWTAuthenticationFilter
 import com.redeyemedia.todolist.Status
 import com.redeyemedia.todolist.entities.Todo
 import com.redeyemedia.todolist.entities.User
 import com.redeyemedia.todolist.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
@@ -17,27 +20,20 @@ class RegisterController(@Autowired private val userRepository: UserRepository) 
     fun getUsers() : List<User> = userRepository.findAll()
 
 
-
-/*    @GetMapping("/id/{id}")
-    fun getUserById(@PathVariable id : Int) : ResponseEntity<User> =
-        userRepository.findById(id).map {
-            ResponseEntity.ok(it)
-        }.orElse(ResponseEntity.notFound().build())*/
-
-
-
     @PostMapping("/register")
-    fun registerUser(@Valid @RequestBody newUser: User): Status {
+    fun registerUser(@Valid @RequestBody newUser: User): ResponseEntity<Any> {
 
        val users: List<User> =  userRepository.findAll()
         println("Users: $users")
         users.map { user ->
             if(user == newUser) {
                 println("User already exists!")
-                return Status.USER_ALREADY_EXISTS
+                return ResponseEntity("User already exists", HttpStatus.CONFLICT)
             }
         }
-        userRepository.save(newUser)
-        return Status.REGISTERSUCCESS
+        // userRepository.save(newUser)
+        //return ResponseEntity.ok(UsernamePasswordAuthenticationFilter(newUser.email, newUser.password))
+        return ResponseEntity.ok(userRepository.save(newUser))
+
     }
 }
