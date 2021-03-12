@@ -33,10 +33,11 @@ open class JWTAuthenticationFilter(authenticationManager: AuthenticationManager)
         response: HttpServletResponse?
     ): Authentication {
 
-/*        val username = request.getParameter("username")
-        val password = request.getParameter("password")*/
-        val username = request.getHeader("username")
-        val password = request.getHeader("password")
+
+        val username = request.getParameter("username")
+        val password = request.getParameter("password")
+/*        val username = request.getHeader("username")
+        val password = request.getHeader("password")*/
         val authenticationToken = UsernamePasswordAuthenticationToken(username, password)
 
         return authenticationManager.authenticate(authenticationToken)
@@ -58,11 +59,6 @@ open class JWTAuthenticationFilter(authenticationManager: AuthenticationManager)
 
         val signingKey: ByteArray = SecurityConstants.JWT_SECRET.toByteArray()
 
-        val base64Key = Encoders.BASE64.encode(signingKey)
-        //creates a spec-compliant secure-random key:
-        val superKey = Keys.secretKeyFor(SignatureAlgorithm.HS512) //or HS384 or HS512
-
-
         val token: String = Jwts.builder()
             .signWith(SignatureAlgorithm.HS512, signingKey)
             .setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
@@ -76,6 +72,6 @@ open class JWTAuthenticationFilter(authenticationManager: AuthenticationManager)
     }
 
     init {
-        setFilterProcessesUrl(SecurityConstants.AUTH_LOGIN_URL);
+         setFilterProcessesUrl(SecurityConstants.AUTH_LOGIN_URL);
     }
 }

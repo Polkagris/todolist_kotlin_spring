@@ -27,14 +27,17 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
         http.cors().and()
             .csrf().disable()
             .authorizeRequests()
-            .antMatchers("/api/**").permitAll()
+            //.antMatchers("/api/**").permitAll()
             .antMatchers(HttpMethod.POST, "/user/login").permitAll()
             .antMatchers(HttpMethod.POST, "/user/register").permitAll()
             .anyRequest().authenticated()
             .and()
-            .addFilter(JwtAuthorizationFilter(authenticationManager()))
+            //.addFilter(JwtAuthorizationFilter(authenticationManager()))
+            // .addFilter(JWTAuthenticationFilter(authenticationManager()))
+            .addFilter(JwtRequestFilter(authenticationManager()))
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
     }
 
     @Throws(Exception::class)

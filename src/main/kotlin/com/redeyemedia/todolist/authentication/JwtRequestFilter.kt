@@ -17,13 +17,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
-import java.util.List;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.SignatureException;
+import org.springframework.beans.factory.annotation.Autowired
 
 
 
-open class JwtAuthorizationFilter(
+open class JwtRequestFilter(
     authenticationManager: AuthenticationManager?) :
     BasicAuthenticationFilter(authenticationManager) {
     @Throws(IOException::class, ServletException::class)
@@ -33,6 +33,7 @@ open class JwtAuthorizationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+
         val authentication = getAuthentication(request)
         if (authentication == null) {
             filterChain.doFilter(request, response)
@@ -42,41 +43,46 @@ open class JwtAuthorizationFilter(
         filterChain.doFilter(request, response)
     }
 
-    private fun getAuthentication(request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
-        val token = request.getHeader(SecurityConstants.TOKEN_HEADER)
-        if (StringUtils.isNotEmpty(token) && token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
-            try {
+        private fun getAuthentication(request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
+            val authorizationHeader = request.getHeader("Authorization")
+
+                // var jwt: String
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
+                val token = request.getHeader(SecurityConstants.TOKEN_HEADER)
+
+                // jwt = authorizationHeader.substring(7)
+
                 val signingKey = SecurityConstants.JWT_SECRET.toByteArray()
+
                 val parsedToken = Jwts.parser()
                     .setSigningKey(signingKey)
                     .parseClaimsJws(token.replace("Bearer ", ""))
+
                 val username = parsedToken
                     .body
                     .subject
-/*                val authorities = (parsedToken.body["rol"] as List<*>?)!!.stream()
+
+                /*val authorities = (parsedToken.body["rol"] as MutableList<*>?)!!.stream()
                     .map { authority: Any? -> SimpleGrantedAuthority(authority as String?) }
                     .collect(Collectors.toList())*/
+                /*val authorities = (parsedToken.body["rol"] as List<*>).stream()
+                    .map { authority: Any? -> SimpleGrantedAuthority(authority as String?) }
+                    .collect(Collectors.toList())*/
+
+                val authorities = parsedToken.body["rol"].toString()
+                    .split(",").filterNot { it.isEmpty() }
+                    .map(::SimpleGrantedAuthority)
+
+
+
+
                 if (StringUtils.isNotEmpty(username)) {
                     println("JWT is magically being authorized &&&&&&&&&&&&&&&&&&&&&& $username")
                     //return UsernamePasswordAuthenticationToken(username, null, authorities)
-                    return UsernamePasswordAuthenticationToken(username, null)
+                    return UsernamePasswordAuthenticationToken(username, null, authorities)
                 }
-            } catch (exception: ExpiredJwtException) {
-                log.warn("Request to parse expired JWT : {} failed : {}", token, exception.message)
-            } catch (exception: UnsupportedJwtException) {
-                log.warn("Request to parse unsupported JWT : {} failed : {}", token, exception.message)
-            } catch (exception: MalformedJwtException) {
-                log.warn("Request to parse invalid JWT : {} failed : {}", token, exception.message)
-            } catch (exception: SignatureException) {
-                log.warn("Request to parse JWT with invalid signature : {} failed : {}", token, exception.message)
-            } catch (exception: IllegalArgumentException) {
-                log.warn("Request to parse empty or null JWT : {} failed : {}", token, exception.message)
             }
+            return null
         }
-        return null
-    }
 
-    companion object {
-        val log: Logger = LoggerFactory.getLogger(JwtAuthorizationFilter::class.java)
-    }
 }
