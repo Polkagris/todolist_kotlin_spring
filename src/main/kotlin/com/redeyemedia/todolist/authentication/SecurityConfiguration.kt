@@ -16,7 +16,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
+import java.util.*
+import javax.ws.rs.DELETE
 
 
 @EnableWebSecurity
@@ -55,8 +56,19 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        //configuration.allowedOrigins = listOf("http://http://localhost:3000")
+        //configuration.allowedMethods = listOf("GET", "POST", "DELETE", "PUT")
+        configuration.addAllowedOrigin("*");
+        configuration.allowedHeaders = listOf("Authorization", "Cache-Control", "Content-Type");
+       // configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("GET");
+        configuration.addAllowedMethod("PUT");
+        configuration.addAllowedMethod("POST");
+        configuration.addAllowedMethod("DELETE");
+
         val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", CorsConfiguration().applyPermitDefaultValues())
+        source.registerCorsConfiguration("/**", configuration)
         return source
     }
 }
