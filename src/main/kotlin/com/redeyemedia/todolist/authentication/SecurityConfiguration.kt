@@ -1,6 +1,5 @@
 package com.redeyemedia.todolist.authentication
 
-import JWTAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder

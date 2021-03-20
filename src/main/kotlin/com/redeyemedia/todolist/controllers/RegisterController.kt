@@ -1,6 +1,5 @@
 package com.redeyemedia.todolist.controllers
 
-import JWTAuthenticationFilter
 import com.redeyemedia.todolist.Status
 import com.redeyemedia.todolist.entities.Todo
 import com.redeyemedia.todolist.entities.User
